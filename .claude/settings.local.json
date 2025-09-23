@@ -1,0 +1,19 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(aws sts:*)",
+      "Bash(aws:*)",
+      "Bash(test-output.json)",
+      "Bash(source .env)",
+      "Bash(cargo:*)",
+      "Bash(curl:*)",
+      "Bash(export:*)",
+      "Bash(export AWS_ACCESS_KEY_ID=\"AKIAZI2LBYMGNL3B5W3I\")",
+      "Bash(export AWS_SECRET_ACCESS_KEY=\"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\")",
+      "Bash(pkill:*)",
+      "WebSearch"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

@@ -1,0 +1,40 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "AllowInvokeAnthropicSydney",
+      "Effect": "Allow",
+      "Action": [
+        "bedrock:InvokeModel",
+        "bedrock:InvokeModelWithResponseStream"
+      ],
+      "Resource": [
+        "arn:aws:bedrock:ap-southeast-2:637423174412:inference-profile/apac.anthropic.*"
+      ]
+    },
+    {
+      "Sid": "AllowAnthropicFoundationModelsForAuth",
+      "Effect": "Allow",
+      "Action": [
+        "bedrock:InvokeModel",
+        "bedrock:InvokeModelWithResponseStream"
+      ],
+      "Resource": ["arn:aws:bedrock:*::foundation-model/anthropic.*"]
+    },
+    {
+      "Sid": "AllowListingProfiles",
+      "Effect": "Allow",
+      "Action": [
+        "bedrock:ListInferenceProfiles",
+        "bedrock:GetInferenceProfile"
+      ],
+      "Resource": "*"
+    },
+    {
+      "Sid": "AllowListingFundationModels",
+      "Effect": "Allow",
+      "Action": ["bedrock:ListFoundationModels"],
+      "Resource": "*"
+    }
+  ]
+}
