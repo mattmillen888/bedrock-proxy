@@ -1,5 +1,6 @@
 use axum::{routing::post, Router};
 use std::{net::SocketAddr, sync::Arc};
+use tracing::info;
 
 mod handlers;
 mod signing;
@@ -13,6 +14,10 @@ use state::AppState;
 async fn main() {
     dotenvy::dotenv().ok();
 
+    tracing_subscriber::fmt()
+        .with_env_filter(tracing_subscriber::EnvFilter::from_default_env())
+        .init();
+
     let state = AppState::from_env();
 
     let app = Router::new()
@@ -21,7 +26,7 @@ async fn main() {
         .with_state(Arc::new(state));
 
     let addr = SocketAddr::from(([127, 0, 0, 1], 3000));
-    println!("🚀 Bedrock proxy running at http://{}", addr);
+    info!("🚀 Bedrock proxy running at http://{}", addr);
 
     let listener = tokio::net::TcpListener::bind(addr).await.unwrap();
     axum::serve(listener, app).await.unwrap();

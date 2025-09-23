@@ -1,15 +1,7 @@
-Got it ✅ — we’ll stick with .env for configuration (already wired up with dotenvy) and I’ll draft you a comprehensive README.md so you can run this project smoothly.
-
-Here’s the README.md you can drop into your project root:
-
-⸻
-
 # 🦀 Bedrock Proxy (Rust + Axum)
 
 A lightweight local proxy server that connects to **AWS Bedrock Claude 4** models with proper authentication.
 Handles AWS Signature V4 signing and supports both JSON and streaming responses.
-
-⸻
 
 ## ✨ Features
 - 🔑 Loads AWS credentials from `.env` file
@@ -18,8 +10,7 @@ Handles AWS Signature V4 signing and supports both JSON and streaming responses.
 - 🔐 Automatic AWS SigV4 request signing
 - 📡 Both JSON and streaming (SSE) endpoints
 - 🔄 Transforms legacy prompt format to messages API
-
-⸻
+- 📊 **Structured logging** with tracing support
 
 ## 📂 Project Structure
 
@@ -28,7 +19,11 @@ bedrock-proxy/
 ├── Cargo.toml          # Dependencies
 ├── .env               # AWS credentials
 └── src/
-    └── main.rs        # Proxy server
+    ├── main.rs        # Server entry point with tracing setup
+    ├── handlers.rs    # Request handlers for invoke endpoints
+    ├── signing.rs     # AWS SigV4 request signing
+    ├── state.rs       # Application state and configuration
+    └── transform.rs   # Payload transformation utilities
 ```
 
 ## ⚙️ Setup
@@ -56,7 +51,22 @@ cargo build
 cargo run
 ```
 
-⸻
+### 4. Configure Logging (Optional)
+The application uses structured logging with tracing. Control log levels using the `RUST_LOG` environment variable:
+
+```bash
+# Show all logs (debug, info, error)
+RUST_LOG=debug source .env && cargo run
+
+# Show only info and error logs (default)
+RUST_LOG=info source .env && cargo run
+
+# Show only errors
+RUST_LOG=error source .env && cargo run
+
+# Filter by module (show only handler logs)
+RUST_LOG=bedrock_proxy::handlers=debug cargo run
+```
 
 ## 🚀 Usage
 
@@ -102,8 +112,6 @@ Legacy format also supported (auto-converted):
 ```
 
 
-⸻
-
 ## 📋 Technical Details
 
 ### Model Configuration
@@ -116,6 +124,14 @@ Legacy format also supported (auto-converted):
 2. Adds required `anthropic_version` parameter
 3. Signs requests with AWS SigV4
 4. Routes to appropriate Bedrock endpoint
+
+### Logging and Monitoring
+The application uses the `tracing` crate for structured logging:
+- **Info level**: Server startup, response status codes
+- **Debug level**: Request/response payloads, streaming chunks
+- **Error level**: Request failures, stream errors
+
+Logs are formatted for easy parsing and can be output as JSON for production monitoring.
 
 ### Rate Limiting
 Claude 4 has strict rate limits. If you see `429 Too Many Requests`, wait before retrying.
@@ -146,8 +162,45 @@ INFERENCE_PROFILE=global.anthropic.claude-sonnet-4-20250514-v1:0
 ```
 
 
-### NOTE: if looking for models Run
-```sh
+## 🔍 Troubleshooting
+
+### View Available Models
+```bash
 source .env
 aws bedrock list-foundation-models
+```
+
+### Enable Debug Logging
+For detailed troubleshooting, run with debug logs:
+```bash
+RUST_LOG=debug cargo run
+```
+
+### Common Issues
+- **Authentication errors**: Verify AWS credentials in `.env`
+- **Region errors**: Ensure your region supports Claude 4
+- **Rate limiting**: Claude 4 has strict limits, wait between requests
+- **Permission errors**: Check IAM permissions for `bedrock:InvokeModel`
+
+## 🏗️ Development
+
+### Dependencies
+Key dependencies and their purposes:
+- `axum` - Web framework
+- `tokio` - Async runtime
+- `reqwest` - HTTP client
+- `aws-sigv4` - AWS request signing
+- `tracing` - Structured logging
+- `serde` - JSON serialization
+
+### Building
+```bash
+# Development build
+cargo build
+
+# Release build (optimized)
+cargo build --release
+
+# Run tests
+cargo test
 ```

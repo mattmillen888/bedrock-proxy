@@ -17,3 +17,5 @@ async-stream = "0.3"
 aws-credential-types = "1.2.6"
 urlencoding = "2.1"
 aws-sdk-bedrockruntime = "1.106.0"
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter", "json"] }

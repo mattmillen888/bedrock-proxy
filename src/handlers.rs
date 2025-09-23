@@ -10,6 +10,7 @@ use futures_util::Stream;
 use http::Request;
 use serde_json::Value;
 use std::{pin::Pin, sync::Arc};
+use tracing::{debug, error, info};
 
 use crate::{
     signing::sign_request,
@@ -28,7 +29,7 @@ pub async fn invoke_handler(
 
     let transformed_payload = transform_payload(payload);
 
-    println!(
+    debug!(
         "📊 Sending payload: {}",
         serde_json::to_string_pretty(&transformed_payload).unwrap()
     );
@@ -58,8 +59,8 @@ pub async fn invoke_handler(
             let status = resp.status();
             match resp.text().await {
                 Ok(text) => {
-                    println!("📨 Response status: {}", status);
-                    println!("📨 Response body: {}", text);
+                    info!("📨 Response status: {}", status);
+                    debug!("📨 Response body: {}", text);
 
                     if status.is_success() {
                         if let Ok(json) = serde_json::from_str::<Value>(&text) {
@@ -97,7 +98,7 @@ pub async fn invoke_stream_handler(
 
     let transformed_payload = transform_payload(payload);
 
-    println!(
+    debug!(
         "🌊 Streaming payload: {}",
         serde_json::to_string_pretty(&transformed_payload).unwrap()
     );
@@ -129,11 +130,11 @@ pub async fn invoke_stream_handler(
             match state.client.execute(reqwest_req).await {
                 Ok(resp) => {
                     let status = resp.status();
-                    println!("🌊 Stream response status: {}", status);
+                    info!("🌊 Stream response status: {}", status);
 
                     if !status.is_success() {
                         if let Ok(text) = resp.text().await {
-                            println!("❌ Stream error: {}", text);
+                            error!("❌ Stream error: {}", text);
                             yield Ok(Event::default().data(format!("Error {}: {}", status, text)));
                         }
                     } else {
@@ -144,7 +145,7 @@ pub async fn invoke_stream_handler(
                             match chunk {
                                 Ok(bytes) => {
                                     let text = String::from_utf8_lossy(&bytes);
-                                    println!("📦 Raw chunk: {:?}", text);
+                                    debug!("📦 Raw chunk: {:?}", text);
                                     yield Ok(Event::default().data(text.to_string()));
                                 }
                                 Err(e) => {
@@ -156,7 +157,7 @@ pub async fn invoke_stream_handler(
                     }
                 }
                 Err(e) => {
-                    println!("❌ Request error: {}", e);
+                    error!("❌ Request error: {}", e);
                     yield Ok(Event::default().data(format!("Request error: {}", e)));
                 }
             }
