@@ -144,3 +144,10 @@ INFERENCE_PROFILE=eu.anthropic.claude-sonnet-4-20250514-v1:0
 # Global (cross-region)
 INFERENCE_PROFILE=global.anthropic.claude-sonnet-4-20250514-v1:0
 ```
+
+
+### NOTE: if looking for models Run
+```sh
+source .env
+aws bedrock list-foundation-models
+```
