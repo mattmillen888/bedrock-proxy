@@ -55,14 +55,16 @@ cargo run
 The application uses structured logging with tracing. Control log levels using the `RUST_LOG` environment variable:
 
 ```bash
+pkill -f bedrock-proxy
+
 # Show all logs (debug, info, error)
-RUST_LOG=debug source .env && cargo run
+source .env && RUST_LOG=debug cargo run
 
 # Show only info and error logs (default)
-RUST_LOG=info source .env && cargo run
+source .env && RUST_LOG=info cargo run
 
 # Show only errors
-RUST_LOG=error source .env && cargo run
+source .env && RUST_LOG=error cargo run
 
 # Filter by module (show only handler logs)
 RUST_LOG=bedrock_proxy::handlers=debug cargo run

@@ -9,7 +9,9 @@
       "Bash(curl:*)",
       "Bash(export:*)",
       "Bash(pkill:*)",
-      "WebSearch"
+      "WebSearch",
+      "Bash(lsof:*)",
+      "Bash(RUST_LOG=debug cargo run)"
     ],
     "deny": [],
     "ask": []
