@@ -165,3 +165,31 @@ pub async fn invoke_stream_handler(
 
     Sse::new(raw_stream).keep_alive(KeepAlive::default())
 }
+
+pub async fn models_handler(
+    State(_state): State<Arc<AppState>>,
+) -> impl IntoResponse {
+    info!("📋 Models endpoint called");
+
+    let models = serde_json::json!({
+        "object": "list",
+        "data": [
+            {
+                "id": "claude-sonnet-4",
+                "object": "model",
+                "created": 1677610602,
+                "owned_by": "anthropic",
+                "permission": [],
+                "root": "claude-sonnet-4",
+                "parent": null
+            }
+        ]
+    });
+
+    Json(models)
+}
+
+pub async fn catch_all_handler(uri: axum::http::Uri, method: axum::http::Method) -> impl IntoResponse {
+    info!("🔍 Unhandled request: {} {}", method, uri);
+    axum::http::StatusCode::NOT_FOUND
+}

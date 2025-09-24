@@ -1,13 +1,12 @@
-use axum::{routing::post, Router};
+use axum::{routing::{any, get, post}, Router};
 use std::{net::SocketAddr, sync::Arc};
-use tracing::info;
 
 mod handlers;
 mod signing;
 mod state;
 mod transform;
 
-use handlers::{invoke_handler, invoke_stream_handler};
+use handlers::{invoke_handler, invoke_stream_handler, models_handler, catch_all_handler};
 use state::AppState;
 
 #[tokio::main]
@@ -23,10 +22,12 @@ async fn main() {
     let app = Router::new()
         .route("/invoke", post(invoke_handler))
         .route("/invoke_stream", post(invoke_stream_handler))
+        .route("/v1/models", get(models_handler))
+        .fallback(any(catch_all_handler))
         .with_state(Arc::new(state));
 
-    let addr = SocketAddr::from(([127, 0, 0, 1], 3000));
-    info!("🚀 Bedrock proxy running at http://{}", addr);
+    let addr = SocketAddr::from(([127, 0, 0, 1], 9678));
+    println!("🚀 Bedrock proxy running at http://{}", addr);
 
     let listener = tokio::net::TcpListener::bind(addr).await.unwrap();
     axum::serve(listener, app).await.unwrap();
